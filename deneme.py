@@ -8,14 +8,44 @@ from sklearn.preprocessing import StandardScaler
 
 st.title("B2B Transaction Dashboard (Excel Upload)")
 
-# Kullanıcıdan Excel dosyası yüklemesini iste
-uploaded_file = st.file_uploader("Lütfen Excel dosyanızı yükleyin", type=["xlsx"])
+st.title("📊 B2B Intelligent Sales Dashboard")
+st.write(
+    "This dashboard is built with *Streamlit* using the B2B Transaction dataset. "
+    "It includes KPIs, interactive visuals and an *ABC–XYZ stock classification* analysis."
+)
 
-if uploaded_file is not None:
-    # Excel dosyasını oku
-    df = pd.read_excel(uploaded_file)
+# -----------------------------
+# DATA LOADING
+# -----------------------------
+@st.cache_data
+def load_data(uploaded_file):
+    """Read Excel from uploader (or local file as fallback)."""
+    if uploaded_file is not None:
+        df = pd.read_excel(uploaded_file)
+    else:
+        # Fallback for running locally (teacher can keep the file in the same folder)
+        df = pd.read_excel("B2B_Transaction_Data.xlsx")
+    return df
 
-    st.success("Dosya başarıyla yüklendi!")
+st.sidebar.header("🔁 Data & Filters")
+
+uploaded_file = st.sidebar.file_uploader(
+    "Upload *B2B_Transaction_Data.xlsx*", type=["xlsx", "xls"]
+)
+
+if uploaded_file is None:
+    st.sidebar.info(
+        "You can upload the homework dataset here.\n\n"
+        "If you are running this locally and the file is in the same folder "
+        "as this script, the app will try to load it automatically."
+    )
+
+# Try loading data (will crash if file is really missing everywhere, which is okay for homework)
+try:
+    df = load_data(uploaded_file)
+except Exception as e:
+    st.error("❌ Data could not be loaded. Please upload the Excel file.")
+    st.stop()
     
     # Veri tablosunu göster
     st.subheader("Veri Tablosu")
